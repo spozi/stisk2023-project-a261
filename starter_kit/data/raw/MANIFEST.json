@@ -1,0 +1,13 @@
+{
+  "files": {
+    "fuelprice.csv": {
+      "url": "https://storage.data.gov.my/commodities/fuelprice.csv",
+      "page": "https://data.gov.my/data-catalogue/fuelprice",
+      "publisher": "Ministry of Finance (MOF), published on data.gov.my",
+      "licence": "CC BY 4.0",
+      "retrieved_at_utc": "2026-11-25T08:14:53+00:00",
+      "bytes": 56095,
+      "sha256": "afa966f73e77b20eeced2461801dc337579703391c8681ef58129311d33a6dd4"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+---
+title: "Malaysian pump prices, 2017 to 2026"
+subtitle: "EXAMPLE: three graphs for a household planning its fuel budget"
+author: "EXAMPLE: replace with your title and team ID"
+format:
+  html:
+    embed-resources: true
+    fig-align: center
+execute:
+  echo: false
+jupyter: python3
+---
+
+```{python}
+#| include: false
+# OPTION B: GRAPH PAGE. If your team chose dashboard.qmd instead, delete this file,
+# and set PRODUCT = "graphs.qmd" in src/config.py if you keep this one.
+# Run `python run_all.py` first. This page reads the processed data and calls the same
+# analysis and graph functions as run_all.py, so it always agrees with outputs/.
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path.cwd().parent))  # the project folder, so that `src` can be imported
+
+from src import analyse, clean, config
+from src import visualise as vz
+
+prices = clean.read_processed()
+changes = analyse.weekly_changes(prices)
+frequency = analyse.change_frequency(changes)
+size = analyse.change_size(changes)
+numbers = analyse.headline(prices)
+corr = analyse.change_correlation(changes, "RON97", "Diesel (Peninsular)")
+source = json.loads((config.RAW_DIR / "MANIFEST.json").read_text(encoding="utf-8"))["files"]["fuelprice.csv"]
+
+
+def words(items: list[str]) -> str:
+    """['a', 'b', 'c'] -> 'a, b and c'."""
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+# Every number in the text is made here, as a string. Use f-strings: a bare NumPy
+# number would appear on the page as np.float64(...).
+latest_year = int(frequency.index.max())
+pct_latest = {fuel: f"{frequency.loc[latest_year, fuel]:.0f}%" for fuel in config.MAIN_FUELS}
+fixed_years = words([str(year) for year in frequency.index if frequency.loc[year, "RON95"] == 0])
+ron97_busy_years = int((frequency["RON97"] > 50).sum())
+ron97 = size.loc["RON97"]
+ron97_moves = changes[(changes["fuel"] == "RON97") & (changes["direction"] != "no change")]
+within_10 = f"{(ron97_moves['change_sen'].abs() <= 10).mean() * 100:.0f}%"
+```
+
+**Who this is for.** A household deciding how much to set aside for fuel each month, who wants to know how often pump prices move and by how much. Prices below were announced on `{python} numbers["latest_date"]`: RON95 `{python} numbers["RON95"]` a litre (`{python} numbers["RON95 (BUDI 95)"]` for drivers eligible for BUDI 95), RON97 `{python} numbers["RON97"]` and diesel `{python} numbers["Diesel (Peninsular)"]`.
+
+## Prices were held flat for years, then began moving most weeks
+
+```{python}
+#| label: fig-trend
+#| fig-cap: "Price per litre at each weekly announcement. Source: Ministry of Finance via data.gov.my (CC BY 4.0)."
+#| fig-alt: "Step lines of four fuel prices from 2017 to 2026. RON95 and diesel stay flat for long periods, RON97 moves more often, all three rise steeply in 2026, and the BUDI 95 price is a flat line from late 2025."
+# Assign the figure to a name (fig = ...). Quarto then shows it once.
+fig = vz.plot_price_trend(prices)
+```
+
+RON95 did not change at all in `{python} fixed_years`. RON97 changed at more than half of the announcements in `{python} str(ron97_busy_years)` of `{python} str(len(frequency))` years (@fig-frequency).
+
+## How often did the price change each year?
+
+```{python}
+#| label: fig-frequency
+#| fig-cap: "Percentage of announcements in each year at which the price changed. The first and latest years are part-years."
+#| fig-alt: "Grouped bar chart of the percentage of announcements with a price change, by year, for RON95, RON97 and diesel."
+fig = vz.plot_change_frequency(frequency)
+```
+
+In `{python} str(latest_year)` so far, the price changed at `{python} pct_latest["RON95"]` of announcements for RON95, `{python} pct_latest["RON97"]` for RON97 and `{python} pct_latest["Diesel (Peninsular)"]` for diesel. A household can no longer assume that this week's price will hold next week.
+
+## Most changes are small, but a few are large
+
+```{python}
+#| label: fig-size
+#| fig-cap: "Size of each change in the RON97 price, in sen per litre. Announcements with no change are left out."
+#| fig-alt: "Histogram of RON97 price changes in sen per litre. Most changes are within 10 sen either way, with a few much larger rises and falls."
+fig = vz.plot_change_distribution(changes, "RON97")
+```
+
+`{python} within_10` of RON97 changes were within 10 sen either way (median `{python} f"{ron97['median_size_sen']:.0f}"` sen), but single changes ranged from `{python} f"{ron97['largest_fall_sen']:+.0f}"` to `{python} f"{ron97['largest_rise_sen']:+.0f}"` sen. RON97 and diesel changes have a `{python} analyse.describe_strength(corr["r"])` correlation (r = `{python} f"{corr['r']:.2f}"`), so they tend to move together; the data do not show why.
+
+## About the data
+
+Weekly retail fuel prices, `{python} source["publisher"]`, licence `{python} source["licence"]`, downloaded on `{python} source["retrieved_at_utc"][:10]` from the [data.gov.my catalogue](https://data.gov.my/data-catalogue/fuelprice). These are announced pump prices, not what drivers paid. The data card in `docs/` lists every check, cleaning decision and limitation.

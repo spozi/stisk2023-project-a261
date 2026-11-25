@@ -1,0 +1,139 @@
+---
+title: "Malaysian pump prices, 2017 to 2026"
+author: "EXAMPLE: replace with your title and team ID"
+format:
+  dashboard:
+    orientation: rows
+    embed-resources: true
+execute:
+  echo: false
+jupyter: python3
+---
+
+```{python}
+#| include: false
+# OPTION A: DASHBOARD. If your team chose graphs.qmd instead, delete this file.
+# Run `python run_all.py` first. This page reads the processed data and calls the same
+# analysis and graph functions as run_all.py, so it always agrees with outputs/.
+import json
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+sys.path.insert(0, str(Path.cwd().parent))  # the project folder, so that `src` can be imported
+
+from src import analyse, clean, config
+from src import visualise as vz
+
+prices = clean.read_processed()
+changes = analyse.weekly_changes(prices)
+frequency = analyse.change_frequency(changes)
+size = analyse.change_size(changes)
+numbers = analyse.headline(prices)
+corr = analyse.change_correlation(changes, "RON97", "Diesel (Peninsular)")
+checks = pd.read_csv(config.TABLES_DIR / "checks.csv")
+source = json.loads((config.RAW_DIR / "MANIFEST.json").read_text(encoding="utf-8"))["files"]["fuelprice.csv"]
+
+
+def words(items: list[str]) -> str:
+    """['a', 'b', 'c'] -> 'a, b and c'."""
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+# Every number in the text is made here, as a string. Use f-strings: a bare NumPy
+# number would appear on the page as np.float64(...).
+latest_year = int(frequency.index.max())
+pct_latest = {fuel: f"{frequency.loc[latest_year, fuel]:.0f}%" for fuel in config.MAIN_FUELS}
+fixed_years = words([str(year) for year in frequency.index if frequency.loc[year, "RON95"] == 0])
+ron97_busy_years = int((frequency["RON97"] > 50).sum())
+budi = prices[prices["fuel"] == "RON95 (BUDI 95)"]
+budi_start = f"{budi['date'].min():%d %B %Y}".lstrip("0")
+gaps = prices.loc[prices["fuel"] == "RON95", "date"].diff().dt.days
+long_gaps = int((gaps > 8).sum())
+```
+
+# Dashboard
+
+## Row {height="18%"}
+
+::: {.valuebox icon="calendar-event" color="secondary"}
+Latest announcement
+
+`{python} numbers["latest_date"]`
+:::
+
+```{python}
+#| content: valuebox
+#| title: "RON95 (BUDI 95), per litre"
+# A value box shows a dictionary. Give it text (an f-string), not a NumPy number.
+dict(icon="fuel-pump", color="success", value=numbers["RON95 (BUDI 95)"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "RON95, per litre"
+dict(icon="fuel-pump", color="primary", value=numbers["RON95"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "RON97, per litre"
+dict(icon="fuel-pump", color="warning", value=numbers["RON97"])
+```
+
+```{python}
+#| content: valuebox
+#| title: "Diesel (Peninsular), per litre"
+dict(icon="truck", color="info", value=numbers["Diesel (Peninsular)"])
+```
+
+## Row {height="42%"}
+
+```{python}
+#| title: "Prices were held flat for years, then moved most weeks (RM per litre)"
+#| fig-alt: "Step lines of four fuel prices from 2017 to 2026. RON95 and diesel stay flat for long periods, RON97 moves more often, all three rise steeply in 2026, and the BUDI 95 price is a flat line from late 2025."
+# Assign the figure to a name (fig = ...). Quarto then shows it once.
+fig = vz.plot_price_trend(prices)
+```
+
+## Row {height="40%"}
+
+```{python}
+#| title: "How often did the price change each year?"
+#| fig-alt: "Grouped bar chart of the percentage of announcements with a price change, by year, for RON95, RON97 and diesel."
+fig = vz.plot_change_frequency(frequency)
+```
+
+```{python}
+#| title: "How big is each RON97 price change?"
+#| fig-alt: "Histogram of RON97 price changes in sen per litre. Most changes are within 10 sen either way, with a few much larger rises and falls."
+fig = vz.plot_change_distribution(changes, "RON97")
+```
+
+::: {.card title="What this shows"}
+- **Fixed, then floating.** RON95 did not change at all in `{python} fixed_years`. RON97 changed at more than half of the announcements in `{python} str(ron97_busy_years)` of `{python} str(len(frequency))` years.
+- **`{python} str(latest_year)` so far.** The price changed at `{python} pct_latest["RON95"]` of announcements for RON95, `{python} pct_latest["RON97"]` for RON97 and `{python} pct_latest["Diesel (Peninsular)"]` for diesel.
+- **Small steps, a few jumps.** The median RON97 change was `{python} f"{size.loc['RON97', 'median_size_sen']:.0f}"` sen a litre, but single changes ranged from `{python} f"{size.loc['RON97', 'largest_fall_sen']:+.0f}"` to `{python} f"{size.loc['RON97', 'largest_rise_sen']:+.0f}"` sen.
+- **Moving together.** Weekly changes in RON97 and diesel have a `{python} analyse.describe_strength(corr["r"])` correlation (r = `{python} f"{corr['r']:.2f}"` over `{python} str(corr["n"])` announcements). This shows that they tend to move together, not why.
+- **Subsidy.** Drivers eligible for BUDI 95 have paid a fixed `{python} numbers["RON95 (BUDI 95)"]` a litre since `{python} budi_start`.
+:::
+
+# About the data
+
+## Row
+
+::: {.card title="Source and method"}
+**Source.** Weekly retail fuel prices, `{python} source["publisher"]`, licence `{python} source["licence"]`. Downloaded on `{python} source["retrieved_at_utc"][:10]` from the [data.gov.my catalogue](https://data.gov.my/data-catalogue/fuelprice).
+
+**What one row is.** In the processed file, one row is the price of one fuel at one announcement: `{python} f"{len(prices):,}"` rows from `{python} numbers["first_date"]` to `{python} numbers["latest_date"]` (`{python} numbers["announcements"]` announcements).
+
+**Cleaning decisions.** Kept the price rows and dropped the weekly-change rows, which repeat the same information (a check confirms that they agree). Reshaped the table from one column per fuel to one row per fuel and date. Removed the empty rows that come before a series began (BUDI 95 began on `{python} budi_start`), instead of filling them with zero.
+
+**Limits.** These are the announced pump prices, not what drivers paid or how much they bought. The first and latest years are part-years, so the bar chart uses percentages. A "weekly" change is the change since the previous announcement: `{python} str(long_gaps)` gaps were longer than 8 days, mostly when prices were announced monthly at the end of 2018. Diesel in East Malaysia and the SKPS prices are not shown.
+:::
+
+```{python}
+#| title: "Data checks run by run_all.py"
+checks
+```

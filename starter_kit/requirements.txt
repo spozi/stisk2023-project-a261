@@ -1,0 +1,10 @@
+# Python 3.11 or newer. Install with:  python -m pip install -r requirements.txt
+# Quarto (version 1.6 or newer) is installed separately: https://quarto.org/docs/get-started/
+# Add any extra package your team needs with an exact version (package==1.2.3), and give a
+# one-sentence reason for it in README.md.
+numpy==2.4.6
+pandas==3.1.1
+pyarrow==26.0.1
+matplotlib==3.11.2
+seaborn==0.13.2
+jupyter==1.1.1

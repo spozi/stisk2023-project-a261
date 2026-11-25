@@ -1,0 +1,14 @@
+# Python and editors
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
+
+# Quarto's working files (the rendered .html is kept: it is part of the submission)
+.quarto/
+product/*_files/
+
+# Never commit secrets
+.env
