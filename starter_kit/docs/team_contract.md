@@ -1,6 +1,8 @@
-# Team contract
+# Team contract (optional)
 
-Agreed on `<date>` by all members (Checkpoint 1).
+Optional: the roles in `proposal.md` are enough. Use this file if your team wants written working rules.
+
+Agreed on `<date>` by all members.
 
 ## Members and roles
 

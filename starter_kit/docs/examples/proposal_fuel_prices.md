@@ -13,8 +13,7 @@ A household that drives to work and school and sets aside a fixed amount for fue
 ## 3. Questions
 
 1. How often did the announced prices of RON95, RON97 and diesel change in each year from 2017 to 2026?
-2. How large is a typical weekly change, and how large are the biggest?
-3. Do RON97 and diesel prices tend to change in the same weeks?
+2. How large is a typical weekly change, how large are the biggest, and do RON97 and diesel tend to change together?
 
 ## 4. Data
 
@@ -37,8 +36,8 @@ A household that drives to work and school and sets aside a fixed amount for fue
 
 | Graph or panel | Kind | Question it answers | Owner |
 |---|---|---|---|
-| Value boxes: latest prices | headline numbers | context for all three | Role 5 |
+| Value boxes: latest prices | headline numbers | context for both | Role 5 |
 | Price per litre at each announcement | trend | 1 | Role 1 |
 | % of announcements with a change, by year | comparison | 1 | Role 3 |
 | Size of each RON97 change | distribution | 2 | Role 4 |
-| Correlation of RON97 and diesel changes (in the text) | relationship | 3 | Role 2 |
+| Correlation of RON97 and diesel changes (in the text) | relationship | 2 | Role 2 |

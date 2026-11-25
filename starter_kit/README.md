@@ -11,9 +11,10 @@
 >    - rewrite `load_check.py`, `clean.py`, `analyse.py` and `visualise.py` for your data, and update the calls in `run_all.py`;
 >    - rewrite `product/dashboard.qmd` or `product/graphs.qmd`, and delete the one you do not use;
 >    - fill in the templates in `docs/`, then delete `docs/examples/`.
-> 5. Before you submit, search the project for the word `EXAMPLE` (VS Code: Ctrl+Shift+F) and remove what is left of the example.
+> 5. Rewrite the "Technical checklist" table below for your own code.
+> 6. Before you submit, search the project for the word `EXAMPLE` (VS Code: Ctrl+Shift+F) and remove what is left of the example.
 
-**Team:** EXAMPLE (`<team-id>`: member names and matric numbers are in `docs/team_contract.md`)
+**Team:** EXAMPLE (`<team-id>`: member names, matric numbers and roles are in `docs/proposal.md`)
 **For:** a household that sets aside a fixed amount for fuel each month
 **Questions:** how often did announced pump prices change each year from 2017 to 2026; how large is a typical change; do RON97 and diesel change together?
 **Product:** Option A, a dashboard: `product/dashboard.html` (opens in any browser, no Python needed)
@@ -55,6 +56,25 @@ docs/                  proposal, data card, team contract, decision log, checkli
 | `data/raw/fuelprice.csv` | Price of Petroleum & Diesel, Ministry of Finance, [data.gov.my](https://data.gov.my/data-catalogue/fuelprice) | CC BY 4.0 | 2026-11-25 (see `MANIFEST.json`) |
 
 The data card for this example is `docs/examples/data_card_fuel_prices.md`. Yours goes in `docs/data_card.md`.
+
+## Technical checklist: where our code does each item
+
+Keep this table up to date: at the presentation the lecturer picks two or three rows and asks you to show them.
+
+| Course week | Item | Where (file and function) |
+|---|---|---|
+| 2 | Functions with docstrings | every file in `src/` |
+| 3–4 | NumPy calculation | `src/analyse.py`, `weekly_changes` (`np.diff`, `np.where`) |
+| 5 | List or dictionary | `src/config.py`, `FUELS`; `src/load_check.py`, `check_raw` |
+| 6 | Select, filter, sort; merge, concat or reshape | `src/clean.py`, `clean` (`melt`); `src/analyse.py`, `weekly_changes` (`concat`) |
+| 7 | Category type or table | `src/clean.py`, `clean` (`pd.Categorical`); `src/analyse.py`, `change_frequency` (`pivot_table`) |
+| 8 | Loop or `if`; checks that stop the pipeline | `src/analyse.py`, `weekly_changes` (loop); `src/load_check.py`, `stop_if_failed` |
+| 9 | Read raw, write processed and outputs | `run_all.py`, `main` |
+| 10 | String methods or regular expression | `src/clean.py`, `clean` (`str.strip().str.lower()`); `src/load_check.py`, `check_raw` (date regex) |
+| 11 | Descriptive statistics | `src/analyse.py`, `change_size` (median), `change_correlation` (r) |
+| 12 | Graphs saved to files | `src/visualise.py`, `plot_*` and `save_figure` |
+| 13 | Quarto document running our code | `product/dashboard.qmd` |
+| 14 | Self-contained HTML built by `run_all.py` | `product/dashboard.html` (`embed-resources: true`) |
 
 ## Extra packages
 

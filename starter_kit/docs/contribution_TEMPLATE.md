@@ -1,6 +1,6 @@
 # Contribution statement: `<name>` (`<matric>`)
 
-Copy this file to `contribution_<matric>.md`. 250 to 400 words, written by you alone.
+Copy this file to `contribution_<matric>.md`. 150 to 250 words, written by you alone.
 
 **Role:** `<role>`  **My graph or panel:** `<title>`
 
