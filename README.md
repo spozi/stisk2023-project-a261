@@ -8,15 +8,6 @@
 **Coverage:** Course weeks 2–14: Python foundations, NumPy arrays, lists and dictionaries, DataFrames and categories, control flow, input/output, strings and regular expressions, statistics, graphics, reports and publishing  
 **Assessed outcome:** **CLO3 (P5, practical skill):** Manipulate data objects using a statistical programming language to identify patterns and relationships.
 
-## Release fields: instructor completes before publication
-
-- **Release date (day 1 of project week 1):** `[INSERT]`
-- **Group registration deadline and link:** `[INSERT]`
-- **Checkpoint dates, final submission date/time and LMS link:** `[INSERT]`
-- **Presentation schedule and location:** `[INSERT]`
-- **Approved late/special-consideration policy or link:** `[INSERT — do not infer a penalty]`
-- **Permitted generative-AI category and disclosure rule:** `[INSERT — e.g., prohibited / limited / permitted with disclosure]`
-
 ## What you will do
 
 Your team chooses **its own topic and its own public dataset**, then builds a small data science solution from start to finish. It begins with a question someone actually needs answered and ends with **a dashboard or a page of graphs** that answers it.
@@ -281,7 +272,7 @@ Delete the starter-kit example before submitting: search the project for the wor
 
 ## Integrity, privacy and attribution
 
-- Follow the generative-AI rule in the release fields. Where AI use is allowed, record it in `docs/ai_use.md` (tool, date, purpose, what you used, how you checked it). If no one used it, write "No generative AI was used."
+- Follow the generative-AI rule announced by the lecturer. Where AI use is allowed, record it in `docs/ai_use.md` (tool, date, purpose, what you used, how you checked it). If no one used it, write "No generative AI was used."
 - Cite your data (publisher, link, licence, date) on the product page and in the data card. Cite any code you adapted and any idea you borrowed.
 - You may help other teams to understand a tool or an error message. You may not share code, graphs or text with them.
 - Never publish anything that identifies a person, and do not name a business or individual in a way that could harm them on the strength of your analysis.
